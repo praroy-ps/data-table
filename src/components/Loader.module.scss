@@ -1,0 +1,13 @@
+.loader {
+  animation: spinner 1s linear forwards infinite;
+}
+
+@keyframes spinner {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
