@@ -1,0 +1,39 @@
+.paginationContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: auto;
+  gap: 1rem;
+  width: 100%;
+  max-width: 500px;
+
+  .pagesContainer {
+    display: flex;
+    list-style: none;
+    gap: 0.5rem;
+    overflow-x: scroll;
+    padding-bottom: 0.5rem;
+  }
+
+  .pagesContainer > * {
+    background-color: rgb(49, 150, 238);
+    padding: 0.3rem;
+    min-width: 40px;
+    text-align: center;
+    cursor: pointer;
+    border: none;
+    border-radius: 8px;
+  }
+
+  .pageItemActive {
+    background-color: blue;
+    color: white;
+  }
+
+  .prev,
+  .next {
+    padding: 0.6rem;
+    text-align: center;
+    cursor: pointer;
+  }
+}

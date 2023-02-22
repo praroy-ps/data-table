@@ -1,1 +1,1 @@
-export const listPageSize: number = 10;
+export const listPageSize: number = 50;

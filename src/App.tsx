@@ -1,8 +1,11 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import Loader from "./components/Loader";
+import Pagination from "./components/Pagination";
 import Table from "./components/Table";
 import { processList } from "./longProcesses/enums";
 import { GetDataType, ProfileListType } from "./types/appData";
+import { listPageSize } from "./utils/constants/app";
+import styles from "./App.module.scss";
 
 type LengthCountType = {
   loading: boolean;
@@ -36,6 +39,48 @@ const App = () => {
     list: [],
     page: 1,
   });
+
+  const handlePageNumber = useCallback((userSelectedPage: number) => {
+    if (window.Worker) {
+      const request = {
+        action: processList.getData,
+        period: "pageNumber",
+        thePageNumber: userSelectedPage,
+      } as GetDataType;
+
+      getDataWorker.postMessage(JSON.stringify(request));
+    }
+  }, []);
+
+  const prevHandler = useCallback((userSelectedPage: number) => {
+    if (profileList.page === 1) {
+      return;
+    }
+
+    if (window.Worker) {
+      const request = {
+        action: processList.getData,
+        period: "prev",
+        thePageNumber: userSelectedPage - 1,
+      } as GetDataType;
+
+      getDataWorker.postMessage(JSON.stringify(request));
+    }
+  }, []);
+
+  const nextHandler = (userSelectedPage: number, thePageLength: number) => {
+    if (userSelectedPage < thePageLength) {
+      if (window.Worker) {
+        const request = {
+          action: processList.getData,
+          period: "next",
+          thePageNumber: userSelectedPage + 1,
+        } as GetDataType;
+
+        getDataWorker.postMessage(JSON.stringify(request));
+      }
+    }
+  };
 
   useEffect(() => {
     if (window.Worker) {
@@ -84,16 +129,29 @@ const App = () => {
   }, [getDataWorker]);
 
   return (
-    <main className="main-container">
-      <section className="count">
+    <main className={styles.mainContainer}>
+      <section className={styles.count}>
         Total count of Profiles is{" "}
         <b>{lengthCount.loading ? <Loader size={14} /> : lengthCount.value}</b>
       </section>
-      <section className="table-container">
+      <section className={styles.tableContainer}>
         {profileList.loading ? (
           <Loader size={40} display="block" />
         ) : (
-          <Table list={profileList.list} />
+          <>
+            <Table list={profileList.list} />
+            <Pagination
+              page={profileList.page}
+              pages={lengthCount.value / listPageSize}
+              pageClick={(pageNumber) => {
+                handlePageNumber(pageNumber);
+              }}
+              prevHandler={() => prevHandler(profileList.page)}
+              nextHandler={() =>
+                nextHandler(profileList.page, lengthCount.value / listPageSize)
+              }
+            />
+          </>
         )}
       </section>
     </main>
